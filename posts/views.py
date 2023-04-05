@@ -32,3 +32,5 @@ def get_post_detail(request, id):
         'message' : '게시글 조회 성공',
         'data' : category_json
     })
+
+print("hello world")
