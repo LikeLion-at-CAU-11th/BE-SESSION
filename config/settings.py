@@ -41,7 +41,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '0.0.0.0',
     "http://localhost::3000",
-    "54.180.35.83"]
+    "54.180.35.83",
+    "*",]
 
 
 # Application definition
