@@ -5,6 +5,11 @@ from django.views.decorators.http import require_http_methods
 from .models import Post, Comment
 import json
 
+from .serializers import PostSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import Http404
 
 # Create your views here.
 
@@ -130,3 +135,35 @@ def get_comment(request, post_id):
         'message' : '댓글 읽어오기 성공',
         'data' : comment_json_list
     })
+
+class PostList(APIView):
+    def post(self, request, format=None):
+        serializer = PostSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+
+    def get(self, request, format = None):
+        posts = Post.objects.all()
+        serializer = PostSerializer(posts, many = True)
+        return Response(serializer.data)
+
+class PostDetail(APIView):
+    def get(self, request,id):
+        post = get_object_or_404(Post, post_id=id)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+    
+    def put(self, request,id):
+        post = get_object_or_404(Post, post_id=id) # 이녀석은 어떤 모델에서 어떤 칼럼값을 기준으로 가져올지 넘겨주는 함수
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, id):
+        post = get_object_or_404(Post, post_id=id)
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
